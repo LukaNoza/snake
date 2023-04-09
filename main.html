@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Snake Game</title>
+	<style>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="400" height="400"></canvas>
+
+	<script>
+		// Set up canvas and context
+		var canvas = document.getElementById("canvas");
+		var ctx = canvas.getContext("2d");
+
+		// Define grid size and cell size
+		var gridSize = 20;
+		var cellSize = canvas.width / gridSize;
+
+		// Define initial snake position and direction
+		var snake = [{x: 10, y: 10}];
+		var direction = "right";
+
+		// Define initial food position
+		var food = getRandomPosition();
+
+		// Define game loop
+		function gameLoop() {
+			// Clear canvas
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Move snake
+			var head = {x: snake[0].x, y: snake[0].y};
+			switch (direction) {
+				case "up":
+					head.y--;
+					break;
+				case "down":
+					head.y++;
+					break;
+				case "left":
+					head.x--;
+					break;
+				case "right":
+					head.x++;
+					break;
+			}
+			snake.unshift(head);
+
+			// Check for collision with food
+			if (head.x == food.x && head.y == food.y) {
+				food = getRandomPosition();
+			} else {
+				snake.pop();
+			}
+
+			// Check for collision with walls
+			if (head.x < 0 || head.x >= gridSize || head.y < 0 || head.y >= gridSize) {
+				clearInterval(interval);
+				alert("Game Over!");
+			}
+
+			// Check for collision with self
+			for (var i = 1; i < snake.length; i++) {
+				if (head.x == snake[i].x && head.y == snake[i].y) {
+					clearInterval(interval);
+					alert("Game Over!");
+				}
+			}
+
+			// Draw snake
+			ctx.fillStyle = "green";
+			for (var i = 0; i < snake.length; i++) {
+				ctx.fillRect(snake[i].x * cellSize, snake[i].y * cellSize, cellSize, cellSize);
+			}
+
+			// Draw food
+			ctx.fillStyle = "red";
+			ctx.fillRect(food.x * cellSize, food.y * cellSize, cellSize, cellSize);
+		}
+
+		// Get random position for food
+		function getRandomPosition() {
+			return {
+				x: Math.floor(Math.random() * gridSize),
+				y: Math.floor(Math.random() * gridSize)
+			};
+		}
+
+		// Set up keyboard controls
+		document.addEventListener("keydown", function(event) {
+			switch (event.keyCode) {
+				case 38: // Up arrow
+					if (direction != "down") direction = "up";
+					break;
+				case 40: // Down arrow
+					if (direction != "up") direction = "down";
+					break;
+				case 37: // Left arrow
+					if (direction != "right") direction = "left";
+					break;
+				case 39: // Right arrow
+					if (direction != "left") direction = "right";
+					break;
+			}
+		});
+
+		// Start game loop
+		var interval = setInterval(gameLoop, 100);
+	</script>
+</body>
+</html>
